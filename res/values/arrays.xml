@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="ROLES">
+         <item>@string/ROLE_SFR</item>
+        <item>@string/ROLE_LSFR</item>
+        <item>@string/ROLE_ACFR</item>
+        <item>@string/ROLE_WFR</item>
+    </string-array>
+    
+</resources>

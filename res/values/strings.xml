@@ -3,6 +3,10 @@
 
     <string name="app_name">AAPK SMS Gateway</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">AAP Karnataka Donation Gateway. Do not disturb</string>
+    <string name="ROLE_SFR">S</string>
+    <string name="ROLE_ACFR">A</string>
+    <string name="ROLE_LSFR">L</string>
+    <string name="ROLE_WFR">W</string>
 
 </resources>

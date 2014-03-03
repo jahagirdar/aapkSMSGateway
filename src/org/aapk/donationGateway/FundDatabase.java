@@ -1,4 +1,4 @@
-package com.example.aapksmsgateway;
+package org.aapk.donationGateway;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,8 +29,19 @@ public class FundDatabase  extends SQLiteOpenHelper{
 
     // Donation table name
     private static final String TABLE_DON = "Donation";
+    private static FundDatabase sInstance;
+    public static FundDatabase getInstance(Context context) {
+
+        // Use the application context, which will ensure that you 
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+          sInstance = new FundDatabase(context.getApplicationContext());
+        }
+        return sInstance;
+      }
  
-    public FundDatabase(Context context) {
+    private FundDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 	@Override
