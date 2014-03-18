@@ -82,6 +82,10 @@ public class incommingSMS extends BroadcastReceiver {
 										smsManager.sendTextMessage(phone, null, "Thanks for donation " + amount +" to AAP", null, null);
 										//smsManager.sendTextMessage(destinationAddress, scAddress, text, sentIntent, deliveryIntent)
 									}
+								}else {
+									String phone=cmd[2];
+									smsManager.sendTextMessage(phone, null, "Not An Authorized donor. Donation not accepted Contact AAP at 9980156580", null, null);
+									
 								}
 
 							} else{
@@ -107,11 +111,16 @@ public class incommingSMS extends BroadcastReceiver {
 									Log.i("SmsReceiver","sms Sent to:" + senderNum);
 								}
 								
-							}else {
-
+							}else if (cmd[0].equals("pledge") && cmd.length>=2){
 								
-
-								int duration = Toast.LENGTH_LONG;
+									String amount=cmd[1];
+									String candidate=cmd[2];
+									PledgeDatabase pdb= PledgeDatabase.getInstance(context);
+									pdb.addPledge(senderNum,amount,candidate);
+									
+							}else {
+								
+														int duration = Toast.LENGTH_LONG;
 								Toast toast = Toast.makeText(context,
 										"senderNum: "+ senderNum + ", message Did not qualify as a valid command. Please check syntax and variables.: " + message, duration);
 								toast.show();
