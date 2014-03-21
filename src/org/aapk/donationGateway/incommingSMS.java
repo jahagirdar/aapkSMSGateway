@@ -40,22 +40,22 @@ public class incommingSMS extends BroadcastReceiver {
 
 					//Add New Volunteer
 					if(cmd[0].equals("add") ){
-						if(cmd.length!=6){
-							Log.i("SmsReceiver","Debug: Incorrect parameter list, Expected 6, got "+cmd.length);
+						if(cmd.length<5){
+							Log.i("SmsReceiver","Debug: Incorrect parameter list, Expected 5, got "+cmd.length);
 						}
 						else{
-							String name=cmd[1];
-							String phone =cmd[2];
-							String limit=cmd[3];
-							String id=cmd[4];
-							String role=cmd[5];
+							String phone =cmd[1];
+							String id=cmd[2];
+							String role=cmd[3];
+							String name=cmd[4];
+							
 							Log.i("SmsReceiver","Debug: Add Vol Command");
 
 							if(volDB.isLeaderOf(phoneNumber,role)){
 								Log.i("SmsReceiver","Debug: Add Vol Command: Leader Detected");
-								volDB.addVolunteer(name,phone,limit,id,role,phoneNumber);
+								volDB.addVolunteer(name,phone,"2000",id,role,phoneNumber);
 								Log.i("SmsReceiver","Debug: Add Vol Command: Sending SMS");
-								smsManager.sendTextMessage(phone, null, "You are added as a " + role +" fundraiser, Your per Donor max limit is  Rs"+ limit, null, null);
+								smsManager.sendTextMessage(phone, null, "You are added as a " + role +" fundraiser, Please check with your Tresurer to know the per donation limits for cash and cheque", null, null);
 							} else {
 								Log.i("SmsReceiver","Debug:Not a Leader, "+senderNum+cmd[0]+ ", "+ cmd[1] + " Phone number:" + cmd[2] +" limit:" +cmd[3] +" id:"+ cmd[4]);
 
@@ -69,22 +69,24 @@ public class incommingSMS extends BroadcastReceiver {
 							if(cmd.length >=5){
 
 								if(volDB.isFundraiser(senderNum)){
-									String amount=cmd[1];
-									String phone=cmd[2];
+									Log.i("SmsReceiver","Debug Donation:" + cmd.length);
+									String phone=cmd[1];
+									String amount=cmd[2];
+									
 									String receipt=cmd[3];
 									String donor_fn=cmd[4];
 									String donor_ln="";
 									if(cmd.length>5)
 										donor_ln=cmd[5];
-									if(Integer.parseInt(amount)<Integer.parseInt(volDB.getLimitByID(senderNum))){
+									//if(Integer.parseInt(amount)<Integer.parseInt(volDB.getLimitByID(senderNum))){
 										Log.i("SmsReceiver","Donation Received:" + amount +", from "+ donor_fn +" "+donor_ln +" "+phone+" Issued receipt#"+receipt);
 										fundDB.addDonation(amount,phone,receipt,senderNum, donor_fn,donor_ln);
-										smsManager.sendTextMessage(phone, null, "Thanks for donation " + amount +" to AAP", null, null);
+										smsManager.sendTextMessage(phone, null, "Thanks for donating Rs " + amount +" to AAP Karnataka. Your Receipt Number is " +receipt+"."+receipt, null, null);
 										//smsManager.sendTextMessage(destinationAddress, scAddress, text, sentIntent, deliveryIntent)
-									}
+									//}
 								}else {
-									String phone=cmd[2];
-									smsManager.sendTextMessage(phone, null, "Not An Authorized donor. Donation not accepted Contact AAP at 9980156580", null, null);
+									String phone=cmd[1];
+									smsManager.sendTextMessage(phone, null, "Not An Authorized fundraiser. Donation not accepted Contact AAP at 9980156580", null, null);
 									
 								}
 
@@ -117,6 +119,8 @@ public class incommingSMS extends BroadcastReceiver {
 									String candidate=cmd[2];
 									PledgeDatabase pdb= PledgeDatabase.getInstance(context);
 									pdb.addPledge(senderNum,amount,candidate);
+									smsManager.sendTextMessage(senderNum,null,"Thank you for pledging " +amount + " Towards funding clean politics", null, null);
+									
 									
 							}else {
 								

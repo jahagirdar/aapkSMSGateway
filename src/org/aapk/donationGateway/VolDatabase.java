@@ -10,10 +10,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class VolDatabase  extends SQLiteOpenHelper{
-	 private static final int DATABASE_VERSION = 2;
+	 private static final int DATABASE_VERSION = 3;
 	    
 	    // Database Name
-	    private static final String DATABASE_NAME = "fundraisers";
+	    private static final String DATABASE_NAME = "volunteersDB";
 	 
 	    // Vol table name
 	    private static final String TABLE_VOL = "volunteer";
@@ -127,11 +127,12 @@ public class VolDatabase  extends SQLiteOpenHelper{
 		}
 		public boolean isFundraiser(SQLiteDatabase db,String phoneNumber) {
 			
-			Log.i("SmsReceiver","isFundraiser: Start");
+			Log.i("SmsReceiver","isFundraiser: Start " +phoneNumber);
 			Cursor cursor = db.query(TABLE_VOL,
 					new String[] { KEY_ROLE, KEY_NAME }, KEY_PH_NO + "=?",
 					new String[] { phoneNumber }, null, null, null, null);
-			
+			if(cursor==null){Log.i("SmsReceiver","Null Cursor");}
+			if(cursor.getCount()==0){Log.i("SmsReceiver","Zero Cursor Count");}
 			if (cursor != null &&cursor.getCount()>0) {
 				Log.i("SmsReceiver","isFundraiser: NotNull, count "+cursor.getCount());
 				cursor.moveToFirst();

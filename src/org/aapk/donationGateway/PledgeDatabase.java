@@ -8,9 +8,9 @@ import android.util.Log;
 
 public class PledgeDatabase  extends SQLiteOpenHelper{
 
-private static final int DATABASE_VERSION = 0;
+private static final int DATABASE_VERSION = 1;
 
-private static final String DATABASE_NAME = "pledgeTable";
+private static final String DATABASE_NAME = "pledgeDB";
 
 
 private static final String KEY_ID = "_id";
@@ -25,7 +25,7 @@ public static final String ROLE_WFR ="W";
 
 
 // Donation table name
-private static final String TABLE_PLEDGE = "Donation";
+private static final String TABLE_PLEDGE = "Pledge_table";
 private static PledgeDatabase sInstance;
 public static PledgeDatabase getInstance(Context context) {
 
