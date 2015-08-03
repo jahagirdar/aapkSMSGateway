@@ -14,9 +14,11 @@ import android.widget.Toast;
 public class incommingSMS extends BroadcastReceiver {
 	// Get the object of SmsManager
 	final SmsManager sms = SmsManager.getDefault();
+	UrlService urlService=new UrlService();
 
 	public void onReceive(Context context, Intent intent) {
-
+		  AppContext.setContext(context);
+			
 		// Retrieves a map of extended data from the intent.
 		final Bundle bundle = intent.getExtras();
 
@@ -36,7 +38,7 @@ public class incommingSMS extends BroadcastReceiver {
 					String message = currentMessage.getDisplayMessageBody().toLowerCase(Locale.US);
 					String [] cmd=message.split("\\s\\s*");
 					SmsManager smsManager=SmsManager.getDefault();
-
+					urlService.upload_all(context);
 
 					//Add New Volunteer
 					if(cmd[0].equals("add") ){
@@ -44,7 +46,7 @@ public class incommingSMS extends BroadcastReceiver {
 							Log.i("SmsReceiver","Debug: Incorrect parameter list, Expected 5, got "+cmd.length);
 						}
 						else{
-							String phone =cmd[1];
+							String phone =fixPhone(cmd[1]);
 							String id=cmd[2];
 							String role=cmd[3];
 							String name=cmd[4];
@@ -56,6 +58,7 @@ public class incommingSMS extends BroadcastReceiver {
 								volDB.addVolunteer(name,phone,"2000",id,role,phoneNumber);
 								Log.i("SmsReceiver","Debug: Add Vol Command: Sending SMS");
 								smsManager.sendTextMessage(phone, null, "You are added as a " + role +" fundraiser, Please check with your Tresurer to know the per donation limits for cash and cheque", null, null);
+							
 							} else {
 								Log.i("SmsReceiver","Debug:Not a Leader, "+senderNum+cmd[0]+ ", "+ cmd[1] + " Phone number:" + cmd[2] +" limit:" +cmd[3] +" id:"+ cmd[4]);
 
@@ -70,7 +73,7 @@ public class incommingSMS extends BroadcastReceiver {
 
 								if(volDB.isFundraiser(senderNum)){
 									Log.i("SmsReceiver","Debug Donation:" + cmd.length);
-									String phone=cmd[1];
+									String phone=fixPhone(cmd[1]);
 									String amount=cmd[2];
 									
 									String receipt=cmd[3];
@@ -83,10 +86,11 @@ public class incommingSMS extends BroadcastReceiver {
 										fundDB.addDonation(amount,phone,receipt,senderNum, donor_fn,donor_ln);
 										smsManager.sendTextMessage(phone, null, "Thanks for donating Rs " + amount +" to AAP Karnataka. Your Receipt Number is " +receipt+"."+receipt, null, null);
 										//smsManager.sendTextMessage(destinationAddress, scAddress, text, sentIntent, deliveryIntent)
+										
 									//}
 								}else {
 									String phone=cmd[1];
-									smsManager.sendTextMessage(phone, null, "Not An Authorized fundraiser. Donation not accepted Contact AAP at 9980156580", null, null);
+									smsManager.sendTextMessage(phone, null, "This volunteer is not an authorized fundraiser. Donation not accepted. Contact AAP at 9980156580", null, null);
 									
 								}
 
@@ -104,7 +108,7 @@ public class incommingSMS extends BroadcastReceiver {
 								if(volDB.isVolunteer(id)){
 
 									Log.i("SmsReceiver","Volunteer Check Passed:" + id);
-									smsManager.sendTextMessage(senderNum,null,"This volunteer is authorized to collect One time cash donation upto Rs " + volDB.getLimitByID(id), null, null);
+									smsManager.sendTextMessage(senderNum,null,"This volunteer is an authorized fundraiser for AAM AADMI Party Karnataka. In case of any query you can contact us at donation@aapkarnataka.org", null, null);
 									Log.i("SmsReceiver","sms Sent to:" + senderNum);
 								}
 								else {
@@ -119,10 +123,16 @@ public class incommingSMS extends BroadcastReceiver {
 									String candidate=cmd[2];
 									PledgeDatabase pdb= PledgeDatabase.getInstance(context);
 									pdb.addPledge(senderNum,amount,candidate);
-									smsManager.sendTextMessage(senderNum,null,"Thank you for pledging " +amount + " Towards funding clean politics", null, null);
+									smsManager.sendTextMessage(senderNum,null,"Thank you for pledging Rs " +amount + " Towards funding clean politics. To know more visit aapkarnataka.org", null, null);
 									
 									
+							}else if(cmd[0].equals("depo") && cmd.length>=2){
+								String amount=cmd[1];
+								String txnID=cmd[2];
+								AccountDatabase adb=AccountDatabase.getInstance(context);
+								adb.addDeposit(senderNum,amount,txnID);
 							}else {
+							
 								
 														int duration = Toast.LENGTH_LONG;
 								Toast toast = Toast.makeText(context,
@@ -149,4 +159,9 @@ public class incommingSMS extends BroadcastReceiver {
 
 		}
 	}    
+	private String fixPhone (String Phone){
+		if (Phone.length()==13 && Phone.startsWith("+")) { return Phone;}
+		if (Phone.length()==10 && !Phone.startsWith("+")){ return "+91"+Phone;	}
+		return null;
+	}
 }
